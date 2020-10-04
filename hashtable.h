@@ -11,7 +11,12 @@ typedef struct nlist {
 	char *defn;
 } slot;
 
-listptr * init_table();
+struct hashtable {
+	size_t n_slots;
+	listptr *slots;
+};
+
+struct hashtable *init_table(size_t);
 listptr lookup(listptr *, char *);
 listptr install (listptr *, char *, char *);
 void printtable(listptr *, int );

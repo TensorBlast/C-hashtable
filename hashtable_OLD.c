@@ -5,12 +5,10 @@
 #define HASHSIZE 101
 
 
-struct hashtable * init_table(size_t n_slots)
+listptr * init_table()
 {
-	struct hashtable *tbl = malloc(sizeof(*tbl));
-	tbl->n_slots = n_slots;
-	tbl->slots = calloc(n_slots, sizeof(*(tbl->slots)));
-	return tbl;
+	listptr *hashtab = (listptr *) calloc(HASHSIZE, sizeof(*hashtab));
+	return hashtab;
 }
 
 unsigned hash (char *s)
