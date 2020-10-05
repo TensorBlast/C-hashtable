@@ -2,7 +2,6 @@
 #include <string.h>
 #include "hashtable.h"
 
-#define HASHSIZE 101
 
 
 hashtable * init_table(size_t n_slots)
