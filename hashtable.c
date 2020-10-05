@@ -5,7 +5,7 @@
 #define HASHSIZE 101
 
 
-struct hashtable * init_table(size_t n_slots)
+hashtable * init_table(size_t n_slots)
 {
 	struct hashtable *tbl = malloc(sizeof(*tbl));
 	tbl->n_slots = n_slots;
@@ -20,31 +20,32 @@ unsigned hash (char *s)
 	for (hashval=0; *s != '\0'; s++)
 		hashval = *s + 31 * hashval;
 
-	return hashval % HASHSIZE;
+	return hashval;
 }
 
-listptr lookup (listptr * hashtab, char *s)
+listptr lookup (hashtable * table, char *s)
 {
 	listptr np;
+	listptr *hashtab = table->slots;
 
-	for (np = hashtab[hash(s)]; np!=NULL; np = np->next)
+	for (np = hashtab[hash(s) % table->n_slots]; np!=NULL; np = np->next)
 		if (strcmp(s, np->name) == 0)
 			return np;
 	return NULL;
 }
 
-listptr install(listptr * hashtab, char *name, char * defn)
+listptr install(hashtable * table, char *name, char * defn)
 {
 	listptr np;
-
+	listptr *hashtab = table->slots;
 	unsigned hashval;
 
-	if((np = lookup(hashtab, name)) == NULL) {
+	if((np = lookup(table, name)) == NULL) {
 		np = (listptr) malloc(sizeof(*np));
 		if (np==NULL || (np->name = strdup(name))==NULL)
 			return NULL;
 
-		hashval = hash(name);
+		hashval = hash(name) % table->n_slots;
 		np->next = hashtab[hashval];
 		hashtab[hashval] = np;
 	}
@@ -58,8 +59,9 @@ listptr install(listptr * hashtab, char *name, char * defn)
 	return np;
 }
 
-void printtable(listptr * table, int len)
+void printtable(hashtable * hashtable, int len)
 {
+	listptr * table = hashtable->slots;
 	listptr p;
 	int i =0;
 	while (i < len) {
@@ -70,4 +72,26 @@ void printtable(listptr * table, int len)
 		}
 		i++;
 	}
+}
+
+int undef(hashtable * hashtable, char * name)
+{
+	listptr * table = hashtable->slots;
+	unsigned hashval = hash(name);
+	listptr p;
+	listptr prev = NULL;
+	listptr np = NULL;
+	for (np = table[hashval % hashtable->n_slots]; np!=NULL; prev=np, np=np->next) {
+		if (strcmp(name, np->name)==0) {
+			if (prev == NULL) {
+				table[hashval % hashtable->n_slots] = np->next;
+				free(np);
+			}
+			else {
+				prev->next = np->next;
+				free(np);
+			}
+		}
+	}
+	return 0;
 }

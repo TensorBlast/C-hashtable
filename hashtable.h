@@ -11,14 +11,15 @@ typedef struct nlist {
 	char *defn;
 } slot;
 
-struct hashtable {
+typedef struct hashtable {
 	size_t n_slots;
 	listptr *slots;
-};
+} hashtable;
 
-struct hashtable *init_table(size_t);
-listptr lookup(listptr *, char *);
-listptr install (listptr *, char *, char *);
-void printtable(listptr *, int );
+hashtable *init_table(size_t);
+listptr lookup(hashtable *, char *);
+listptr install (hashtable *, char *, char *);
+void printtable(hashtable *, int );
+int undef(hashtable *, char *);
 
 #endif
